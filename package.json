@@ -1,0 +1,13 @@
+{
+  "name": "speech-sdk-crl-infographic",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "npx http-server . -p 5500 -c-1",
+    "export:png": "node scripts/export-png.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.53.0"
+  }
+}

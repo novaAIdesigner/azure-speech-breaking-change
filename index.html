@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azure Speech SDK 紧急行动指南</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#0B3D91',
+              warn: '#F59E0B',
+              danger: '#DC2626',
+              safe: '#16A34A',
+              body: '#9CA3AF'
+            },
+            fontFamily: {
+              sans: ['"Microsoft YaHei"', '"PingFang SC"', '"Noto Sans CJK SC"', 'sans-serif']
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      .node {
+        background: rgba(15, 23, 42, 0.8);
+        border: 2px solid #1d4ed8;
+      }
+      .branch-line {
+        background: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-950 font-sans text-slate-100">
+    <main class="mx-auto my-8 w-[1080px] min-h-[1920px] rounded-2xl border border-slate-700 bg-slate-900 p-10 shadow-2xl">
+      <header class="rounded-2xl border border-slate-700 bg-slate-800/90 p-7">
+        <div class="mb-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="grid grid-cols-2 gap-1">
+              <span class="h-4 w-4 bg-[#F25022]"></span>
+              <span class="h-4 w-4 bg-[#7FBA00]"></span>
+              <span class="h-4 w-4 bg-[#00A4EF]"></span>
+              <span class="h-4 w-4 bg-[#FFB900]"></span>
+            </div>
+            <span class="text-2xl font-semibold tracking-tight text-slate-100">Microsoft</span>
+          </div>
+          <div class="inline-flex items-center rounded-full border border-danger/40 bg-danger/10 px-5 py-2 text-[27px] font-bold text-danger">⏰ 截止日期：2026/7/1</div>
+        </div>
+        <h1 class="text-5xl font-extrabold leading-tight text-blue-300">Azure Speech SDK（Linux/Android）CRL 兼容性风险：2026/7/1 前必须行动</h1>
+        <p class="mt-4 text-[27px] leading-relaxed text-body">行业证书体系演进(SC-089)触发，Speech SDK强制升级需求</p>
+      </header>
+
+      <section class="mt-6 grid grid-cols-2 gap-5">
+        <article class="rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+          <h2 class="mb-4 text-3xl font-bold text-blue-300">为什么会发生（根因）</h2>
+          <ul class="space-y-3 text-[27px] leading-relaxed text-slate-200">
+            <li class="flex gap-2"><span>📜</span><span>证书机构正在转向新的 CRL 架构；旧版 SDK（&lt; 1.48.2）在 Linux/Android 上 CRL 缓存处理不兼容。</span></li>
+            <li class="flex gap-2"><span>🛡️</span><span>可能触发 OpenSSL 验证错误并导致连接失败。</span></li>
+            <li class="flex gap-2"><span>⚡</span><span>表现：证书校验失败、OpenSSL<br/>error 44 / X509_V_ERR_DIFFERENT<br/>_CRL_SCOPE。</span></li>
+            <li class="flex gap-2"><span>✅</span><span>Windows / iOS / macOS 不受影响；聚焦 Linux / Android。</span></li>
+          </ul>
+        </article>
+
+        <article class="rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+          <h2 class="mb-4 text-3xl font-bold text-blue-300">谁会受影响</h2>
+          <div class="space-y-3 text-[27px] text-slate-200">
+            <div>
+              <p class="mb-2 font-semibold"><span class="text-[2em] leading-none align-middle">🚗📱☁️</span> 平台</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-brand/30 px-4 py-1 text-blue-100">Linux</span>
+                <span class="rounded-full bg-brand/30 px-4 py-1 text-blue-100">Android</span>
+                <span class="rounded-full bg-slate-700 px-4 py-1 text-slate-200">全语言绑定</span>
+              </div>
+            </div>
+            <div>
+              <p class="mb-2 font-semibold">场景</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-warn/20 px-4 py-1 text-amber-300">Hybrid（Cloud + Embedded）</span>
+                <span class="rounded-full bg-warn/20 px-4 py-1 text-amber-300">Cloud Only</span>
+                <span class="rounded-full bg-safe/20 px-4 py-1 text-green-300">纯 Embedded 且从不连云端<BR/>通常不受影响</span>
+              </div>
+            </div>
+            <div>
+              <p class="font-semibold">关键触发条件</p>
+              <p class="mt-2 rounded-lg border border-danger/40 bg-danger/15 px-4 py-2 text-danger">启用 certificate caching（Cert/CRL 缓存）时风险最高。</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-7 rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+        <h2 class="mb-5 text-center text-4xl font-extrabold text-blue-300">自检与缓解</h2>
+
+        <div class="mx-auto max-w-[980px] text-[27px]">
+          <div class="space-y-3">
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">👤 开始：你是否在 Linux/Android 上使用 Speech SDK &lt; 1.48.2 并连接云端？</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">否</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ 风险低 / 不在本次影响范围，建议继续监控</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-8">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">是</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q1：设备/应用是否启用了 Cert/CRL 缓存（例如落盘/持久化缓存）？</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">否</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ 通常不受影响；异常时可重启进程/设备刷新内存态缓存（排障手段）</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-8">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">是</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q2：你能否刷新缓存（例如重启设备/重启应用）来清理旧缓存？</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-amber-300">能</span>
+              </div>
+              <div class="rounded-xl border border-warn/40 bg-warn/10 p-4 text-amber-300">🟧⏳ 可作为临时缓解，但仍需尽快落实长期方案（继续 Q3/Q4）</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">不能</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q3：你能否通过远程配置将 SDK 设置为禁用 CRL 检查 OPENSSL_DISABLE_CRL_<br/>CHECK = true？</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">能</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ 可规避中断风险，同时制定升级计划</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">不能</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q4：你能否在 2026/7/1 前完成 OTA 升级到 Speech SDK v1.48.2+？<br><span class="text-base font-medium text-slate-300">（需要静默OTA / 部分OTA / SOTA）</span></p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">能</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ 推荐方案：升级到 v1.48.2+（根治）</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="absolute left-1/2 top-0 h-full w-1 -translate-x-1/2 bg-red-500"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-red-300">不能</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="mt-1">
+              <div class="rounded-xl border-2 border-danger/70 bg-danger/15 p-4 text-red-300"><span>🛑</span><span class="ml-1">⚠️</span> 高风险：可能出现 Cloud STT/TTS 连接失败，请立即联系 Microsoft 支持团队/客户团队制定应急方案。<p class="mt-2 text-[18px] font-bold text-red-300">越接近 7/1，风险越不可控。</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-7">
+        <h2 class="mb-4 text-3xl font-bold text-blue-300">行动清单</h2>
+        <div class="grid grid-cols-3 gap-4 text-[27px]">
+          <article class="rounded-xl border border-slate-700 bg-slate-800/70 p-5">
+            <h3 class="font-bold text-blue-300">1) 立即自查</h3>
+            <p class="mt-2 text-slate-200">平台 / 版本 / 是否连云 / 是否启用缓存。</p>
+          </article>
+          <article class="rounded-xl border border-warn/50 bg-warn/10 p-5">
+            <h3 class="font-bold text-amber-300">2) 优先缓解</h3>
+            <p class="mt-2 text-slate-100">优先远程配置禁用 CRL 检查；可重启作为临时手段。</p>
+          </article>
+          <article class="rounded-xl border border-safe/50 bg-safe/10 p-5">
+            <h3 class="font-bold text-green-300">3) 最终修复</h3>
+            <p class="mt-2 text-slate-100">升级到 Speech SDK v1.48.2+（长期正确解）。</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="mt-8 border-t border-slate-700 pt-4 text-[18px] text-body">
+        <p>参考来源：内部公告《Azure Speech SDK v1.48.2 – CRL Compatibility Fix – Action Required Before July 1, 2026》</p>
+        <p>行业背景：CA/Browser Forum Ballot SC‑089 - https://cabforum.org/2025/07/22/ballot-sc-089-mass-revocation-planning/</p>
+      </footer>
+    </main>
+  </body>
+</html>
