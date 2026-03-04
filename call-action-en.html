@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azure Speech SDK Urgent Action Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#0B3D91',
+              warn: '#F59E0B',
+              danger: '#DC2626',
+              safe: '#16A34A',
+              body: '#9CA3AF'
+            },
+            fontFamily: {
+              sans: ['"Segoe UI"', '"Inter"', 'Arial', 'sans-serif']
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      .node {
+        background: rgba(15, 23, 42, 0.8);
+        border: 2px solid #1d4ed8;
+      }
+      .branch-line {
+        background: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body class="bg-slate-950 font-sans text-slate-100">
+    <main class="mx-auto my-8 w-[1080px] min-h-[1920px] rounded-2xl border border-slate-700 bg-slate-900 p-10 shadow-2xl">
+      <header class="rounded-2xl border border-slate-700 bg-slate-800/90 p-7">
+        <div class="mb-5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="grid grid-cols-2 gap-1">
+              <span class="h-4 w-4 bg-[#F25022]"></span>
+              <span class="h-4 w-4 bg-[#7FBA00]"></span>
+              <span class="h-4 w-4 bg-[#00A4EF]"></span>
+              <span class="h-4 w-4 bg-[#FFB900]"></span>
+            </div>
+            <span class="text-2xl font-semibold tracking-tight text-slate-100">Microsoft</span>
+          </div>
+          <div class="inline-flex items-center rounded-full border border-danger/40 bg-danger/10 px-5 py-2 text-[27px] font-bold text-danger">⏰ Deadline: July 1, 2026</div>
+        </div>
+        <h1 class="text-5xl font-extrabold leading-tight text-blue-300">Azure Speech SDK (Linux/Android) CRL Compatibility Risk: Action Required Before 2026/7/1</h1>
+        <p class="mt-4 text-[27px] leading-relaxed text-body">Industry PKI evolution is driving this change: CA/Browser Forum “Mass Revocation Planning (SC-089)” requires readiness for large-scale certificate revocation scenarios.</p>
+      </header>
+
+      <section class="mt-6 grid grid-cols-2 gap-5">
+        <article class="rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+          <h2 class="mb-4 text-3xl font-bold text-blue-300">Why This Happens (Root Cause)</h2>
+          <ul class="space-y-3 text-[27px] leading-relaxed text-slate-200">
+            <li class="flex gap-2"><span>📜</span><span>CAs are moving to partitioned CRL architecture; SDK versions &lt; 1.48.2 can mismatch CRL cache scope on Linux/Android.</span></li>
+            <li class="flex gap-2"><span>🛡️</span><span>This can trigger OpenSSL certificate validation failures and connection errors.</span></li>
+            <li class="flex gap-2"><span>⚡</span><span>Typical signals: OpenSSL error 44 / X509_V_ERR_DIFFERENT_CRL_SCOPE.</span></li>
+            <li class="flex gap-2"><span>✅</span><span>Windows, iOS, and macOS are not affected; focus is Linux/Android.</span></li>
+          </ul>
+        </article>
+
+        <article class="rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+          <h2 class="mb-4 text-3xl font-bold text-blue-300">Who Is Impacted</h2>
+          <div class="space-y-3 text-[27px] text-slate-200">
+            <div>
+              <p class="mb-2 font-semibold"><span class="text-[2em] leading-none align-middle">🚗📱☁️</span> Platforms</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-brand/30 px-4 py-1 text-blue-100">Linux</span>
+                <span class="rounded-full bg-brand/30 px-4 py-1 text-blue-100">Android</span>
+                <span class="rounded-full bg-slate-700 px-4 py-1 text-slate-200">All language bindings</span>
+              </div>
+            </div>
+            <div>
+              <p class="mb-2 font-semibold">Scenarios</p>
+              <div class="flex flex-wrap gap-2">
+                <span class="rounded-full bg-warn/20 px-4 py-1 text-amber-300">Hybrid (cloud + embedded fallback)</span>
+                <span class="rounded-full bg-warn/20 px-4 py-1 text-amber-300">Cloud only</span>
+                <span class="rounded-full bg-safe/20 px-4 py-1 text-green-300">Embedded-only without cloud is usually not impacted</span>
+              </div>
+            </div>
+            <div>
+              <p class="font-semibold">Highest Risk Trigger</p>
+              <p class="mt-2 rounded-lg border border-danger/40 bg-danger/15 px-4 py-2 text-danger">certificate caching (Cert/CRL cache) enabled.</p>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="mt-7 rounded-2xl border border-slate-700 bg-slate-800/70 p-6">
+        <h2 class="mb-5 text-center text-4xl font-extrabold text-blue-300">Decision Tree (Self-Check & Mitigation)</h2>
+
+        <div class="mx-auto max-w-[980px] text-[27px]">
+          <div class="space-y-3">
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">👤 Start: Are you using Speech SDK &lt; 1.48.2 on Linux/Android and connecting to cloud endpoints?</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">No</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ Low risk / out of current impact scope; continue monitoring</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-8">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">Yes</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q1: Is Cert/CRL caching enabled (disk persistence)?</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">No</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ Usually unaffected; if needed, restart process/device to clear memory cache</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-8">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">Yes</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q2: Can you refresh cache (restart app/device) to clear stale entries?</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-amber-300">Yes</span>
+              </div>
+              <div class="rounded-xl border border-warn/40 bg-warn/10 p-4 text-amber-300">🟧⏳ Temporary mitigation only; still proceed to long-term plan (Q3/Q4)</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">No</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q3: Can you remotely set OPENSSL_DISABLE_CRL_CHECK = true?</p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">Yes</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ Mitigates interruption risk while you prepare upgrade</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="branch-line absolute left-1/2 top-0 h-full w-1 -translate-x-1/2"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-blue-300">No</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] items-center gap-3">
+              <div class="node rounded-xl p-4">
+                <p class="font-bold">Q4: Can you complete OTA upgrade to Speech SDK v1.48.2+ before 2026/7/1?<br><span class="text-base font-medium text-slate-300">(Silent OTA / Partial OTA / Full OTA)</span></p>
+              </div>
+              <div class="relative h-1">
+                <div class="branch-line h-1 w-full"></div>
+                <span class="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-green-300">Yes</span>
+              </div>
+              <div class="rounded-xl border border-safe/40 bg-safe/10 p-4 text-green-300">✅ Recommended fix: upgrade to v1.48.2+ (permanent)</div>
+            </div>
+
+            <div class="grid grid-cols-[1fr_72px_1fr] gap-3">
+              <div class="flex justify-center">
+                <div class="relative h-9 w-10">
+                  <div class="absolute left-1/2 top-0 h-full w-1 -translate-x-1/2 bg-red-500"></div>
+                  <span class="absolute left-1/2 top-1 -translate-x-1/2 whitespace-nowrap text-[24px] font-semibold leading-none text-red-300">No</span>
+                </div>
+              </div>
+              <div></div>
+              <div></div>
+            </div>
+
+            <div class="mt-1">
+              <div class="rounded-xl border-2 border-danger/70 bg-danger/15 p-4 text-red-300"><span>🛑</span><span class="ml-1">⚠️</span> High risk: Cloud STT/TTS connectivity may fail. Contact Microsoft support/customer team immediately for an emergency plan.<p class="mt-2 text-[18px] font-bold text-red-300">The closer to 7/1, the less controllable the risk becomes.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-7">
+        <h2 class="mb-4 text-3xl font-bold text-blue-300">Action Checklist</h2>
+        <div class="grid grid-cols-3 gap-4 text-[27px]">
+          <article class="rounded-xl border border-slate-700 bg-slate-800/70 p-5">
+            <h3 class="font-bold text-blue-300">1) Immediate Assessment</h3>
+            <p class="mt-2 text-slate-200">Platform / SDK version / cloud usage / cache setting.</p>
+          </article>
+          <article class="rounded-xl border border-warn/50 bg-warn/10 p-5">
+            <h3 class="font-bold text-amber-300">2) Priority Mitigation</h3>
+            <p class="mt-2 text-slate-100">Remote disable CRL check first; restart as temporary relief.</p>
+          </article>
+          <article class="rounded-xl border border-safe/50 bg-safe/10 p-5">
+            <h3 class="font-bold text-green-300">3) Final Remediation</h3>
+            <p class="mt-2 text-slate-100">Upgrade to Speech SDK v1.48.2+ as the long-term fix.</p>
+          </article>
+        </div>
+      </section>
+
+      <footer class="mt-8 border-t border-slate-700 pt-4 text-[18px] text-body">
+        <p>Reference: Internal bulletin “Azure Speech SDK v1.48.2 – CRL Compatibility Fix – Action Required Before July 1, 2026”.</p>
+        <p>Industry context: CA/Browser Forum Ballot SC-089.</p>
+      </footer>
+    </main>
+  </body>
+</html>

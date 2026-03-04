@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Azure AI Speech SDK CRL Compatibility Update</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: '#0B3D91',
+              warn: '#F59E0B',
+              danger: '#DC2626',
+              safe: '#16A34A'
+            }
+          }
+        }
+      };
+    </script>
+  </head>
+  <body class="bg-slate-950 text-slate-100 antialiased">
+    <main class="mx-auto my-8 max-w-5xl rounded-2xl border border-slate-700 bg-slate-900 p-8 md:p-10">
+      <header class="rounded-xl border border-slate-700 bg-slate-800/70 p-6">
+        <p class="inline-flex items-center rounded-full border border-danger/40 bg-danger/10 px-4 py-1 text-sm font-semibold text-red-300">
+          Important: Action required before July 1, 2026
+        </p>
+        <h1 class="mt-4 text-3xl font-extrabold text-blue-300 md:text-4xl">
+          Azure AI Speech SDK: Certificate Revocation List (CRL) compatibility update
+        </h1>
+        <p class="mt-4 text-lg leading-relaxed text-slate-300">
+          Summary: On Linux and Android, Speech SDK versions earlier than 1.48.2 can fail to connect to Azure Speech Service due to CRL partitioning changes in the certificate ecosystem. If you use cloud speech features, you should upgrade or mitigate before July 1, 2026.
+        </p>
+      </header>
+
+      <section class="mt-6 grid gap-4 md:grid-cols-3">
+        <article class="rounded-xl border border-slate-700 bg-slate-800/60 p-4">
+          <h2 class="text-lg font-bold text-blue-300">Affected Platforms</h2>
+          <p class="mt-2 text-slate-200">Linux, Android</p>
+        </article>
+        <article class="rounded-xl border border-slate-700 bg-slate-800/60 p-4">
+          <h2 class="text-lg font-bold text-blue-300">Affected Versions</h2>
+          <p class="mt-2 text-slate-200">Speech SDK &lt; 1.48.2</p>
+        </article>
+        <article class="rounded-xl border border-slate-700 bg-slate-800/60 p-4">
+          <h2 class="text-lg font-bold text-blue-300">Not Affected</h2>
+          <p class="mt-2 text-slate-200">Windows, iOS, macOS, SDK 1.48.2+</p>
+        </article>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">Quick Impact Check</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-6 text-slate-200">
+          <li>You run Speech SDK on Linux or Android.</li>
+          <li>You use SDK version earlier than 1.48.2.</li>
+          <li>Your app connects to Azure Speech cloud endpoints (STT/TTS).</li>
+        </ul>
+        <p class="mt-3 text-slate-300">If all are true, action is required.</p>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">Deployment Impact Summary</h2>
+        <div class="mt-4 overflow-x-auto">
+          <table class="w-full min-w-[680px] border-collapse text-left">
+            <thead>
+              <tr class="border-b border-slate-700 text-slate-300">
+                <th class="py-2 pr-4 font-semibold">Deployment Type</th>
+                <th class="py-2 pr-4 font-semibold">Impact</th>
+                <th class="py-2 font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody class="text-slate-200">
+              <tr class="border-b border-slate-800">
+                <td class="py-3 pr-4">Embedded only (no cloud)</td>
+                <td class="py-3 pr-4 text-green-300">Not impacted</td>
+                <td class="py-3">No action needed</td>
+              </tr>
+              <tr class="border-b border-slate-800">
+                <td class="py-3 pr-4">Hybrid (cloud + embedded fallback)</td>
+                <td class="py-3 pr-4 text-amber-300">Cloud STT/TTS may fail</td>
+                <td class="py-3">Action required for cloud path</td>
+              </tr>
+              <tr>
+                <td class="py-3 pr-4">Cloud only</td>
+                <td class="py-3 pr-4 text-red-300">Cloud STT/TTS may fail with no fallback</td>
+                <td class="py-3">Action required</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">Required Action (Before July 1, 2026)</h2>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <article class="rounded-lg border border-safe/40 bg-safe/10 p-4">
+            <h3 class="text-lg font-bold text-green-300">Option 1 (Recommended): Upgrade to SDK 1.48.2+</h3>
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-slate-100">
+              <li>Includes fix for partitioned CRL handling.</li>
+              <li>Validate by confirming no error 44 in logs.</li>
+              <li>Test cross-region connections if applicable.</li>
+            </ul>
+          </article>
+          <article class="rounded-lg border border-warn/40 bg-warn/10 p-4">
+            <h3 class="text-lg font-bold text-amber-300">Option 2: Disable CRL checking</h3>
+            <ul class="mt-2 list-disc space-y-1 pl-5 text-slate-100">
+              <li>Set <span class="font-mono">OPENSSL_DISABLE_CRL_CHECK=true</span>.</li>
+              <li>Use when immediate upgrade is not possible.</li>
+              <li>Still plan upgrade as the long-term fix.</li>
+            </ul>
+          </article>
+        </div>
+        <pre class="mt-4 overflow-x-auto rounded-lg border border-slate-700 bg-slate-900 p-4 text-sm text-slate-200"><code>// C# example
+config.SetProperty("OPENSSL_DISABLE_CRL_CHECK", "true");</code></pre>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">If You Cannot Fix Immediately</h2>
+        <p class="mt-3 text-slate-200">
+          Temporary workaround: clear or avoid CRL disk cache by unsetting <span class="font-mono">TMPDIR</span>/<span class="font-mono">TMP</span> or deleting cached <span class="font-mono">.crl</span> files in the temp directory, then restart the app.
+        </p>
+        <p class="mt-2 text-amber-300">This is temporary only. Upgrade or disable CRL checking is still required.</p>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">How to Detect the Issue</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-6 text-slate-200">
+          <li>Connection failures with <span class="font-mono">WS_OPEN_ERROR_UNDERLYING_IO_OPEN_FAILED</span>.</li>
+          <li>TLS log includes error 44: <span class="font-mono">X509_V_ERR_DIFFERENT_CRL_SCOPE</span>.</li>
+          <li>Often appears after certificate rotation or cross-region usage.</li>
+        </ul>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-danger/40 bg-danger/10 p-6">
+        <h2 class="text-2xl font-bold text-red-300">Risk If No Action Is Taken</h2>
+        <ul class="mt-3 list-disc space-y-2 pl-6 text-red-100">
+          <li>Unplanned cloud STT/TTS outages on Linux/Android.</li>
+          <li>No exact warning window (depends on cert rotation timing).</li>
+          <li>Service remains unstable until upgrade/mitigation is applied.</li>
+        </ul>
+      </section>
+
+      <section class="mt-6 rounded-xl border border-slate-700 bg-slate-800/60 p-6">
+        <h2 class="text-2xl font-bold text-blue-300">Timeline</h2>
+        <ol class="mt-3 list-decimal space-y-2 pl-6 text-slate-200">
+          <li><span class="font-semibold">Now:</span> Confirm platform, version, and deployment type.</li>
+          <li><span class="font-semibold">February 2026:</span> SDK 1.48.2 released with fix.</li>
+          <li><span class="font-semibold">July 1, 2026:</span> Deadline to upgrade or mitigate.</li>
+          <li><span class="font-semibold">After deadline:</span> Unpatched apps may intermittently fail as certs rotate.</li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>
